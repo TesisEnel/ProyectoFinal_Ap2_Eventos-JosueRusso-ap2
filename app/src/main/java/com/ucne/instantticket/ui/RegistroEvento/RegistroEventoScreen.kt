@@ -39,13 +39,14 @@ import com.ucne.instantticket.data.entity.EventoEntity
 
 @Composable
 fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int = 0 ) {
-
+if( id > 0)
     remember {
         viewModel.onEvent(EventoEvent.onSearch(id))
         0
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val evento = state.evento
+    val isError = state.error != null || state.emptyFields.isNotEmpty()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -72,8 +73,8 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                     OutlinedTextField(
                         value = evento.nombreEvento,
                         onValueChange = { viewModel.onEvent(EventoEvent.nombreEvento(it)) },
-                        isError = true,
                         label = { Text(text = "Nombre del Evento") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp))
@@ -85,10 +86,10 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                         value = evento.fecha,
                         onValueChange = { viewModel.onEvent(EventoEvent.fecha(it)) },
                         label = { Text(text = "Fecha") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(5.dp)
-                            .border(1.dp, if (state.emptyFields.contains("Fecha")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp)),
+                            .padding(5.dp),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next
@@ -102,10 +103,10 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                         value = evento.descripcion,
                         onValueChange = { viewModel.onEvent(EventoEvent.descripcion(it)) },
                         label = { Text(text = "Descripcion") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp)
-                            .border(1.dp, if (state.emptyFields.contains("Descripcion")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp))
                     )
                     if (state.emptyFields.contains("Descripcion")) {
                         Text(text = "Descripcion es requerido", color = Color.Red)
@@ -116,9 +117,9 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                         value = evento.recordatorio,
                         onValueChange = { viewModel.onEvent(EventoEvent.recordatorio(it)) },
                         label = { Text(text = "Recordatorio") },
+                        isError = isError,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp).border(1.dp, if (state.emptyFields.contains("Recordatorio")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp)),
+                            .fillMaxWidth(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next

@@ -93,19 +93,7 @@ private fun ConsultaCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("id: ")
-                            }
-                            withStyle(style = SpanStyle()) {
-                                append("${evento.idevento}")
-
-                            }
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
+                    
                     Text(
                         text = buildAnnotatedString {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {

@@ -91,10 +91,10 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                         value = usuario.nombreUsuario,
                         onValueChange = { viewModel.onEvent(UsuarioEvent.nombreUsuario(it)) },
                         label = { Text(text = "Nombre de Usuario") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp)
-                            .border(1.dp, if (state.emptyFields.contains("Nombre de Usuario")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp))
                     )
                     if (state.emptyFields.contains("Nombre de Usuario")) {
                         Text(text = "Nombre de Usuario es requerido", color = Color.Red)
@@ -104,10 +104,10 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                         value = usuario.edad.toString(),
                         onValueChange = { viewModel.onEvent(UsuarioEvent.edad(it)) },
                         label = { Text(text = "Edad") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(5.dp)
-                            .border(1.dp, if (state.emptyFields.contains("Edad")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp)),
+                            .padding(5.dp),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next
@@ -122,9 +122,9 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                         value = usuario.fechaNacimiento,
                         onValueChange = { viewModel.onEvent(UsuarioEvent.fechaNacimiento(it)) },
                         label = { Text(text = "Fecha de Nacimiento") },
+                        isError = isError,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp).border(1.dp, if (state.emptyFields.contains("Fecha de Nacimiento")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp)),
+                            .fillMaxWidth(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next
@@ -138,10 +138,10 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                         value = usuario.email,
                         onValueChange = { viewModel.onEvent(UsuarioEvent.email(it)) },
                         label = { Text(text = "Email") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp)
-                            .border(1.dp, if (state.emptyFields.contains("Email")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp))
                     )
                     if (state.emptyFields.contains("Email")) {
                         Text(text = "Email es requerido", color = Color.Red)
@@ -151,10 +151,10 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                         value = usuario.password,
                         onValueChange = { viewModel.onEvent(UsuarioEvent.password(it)) },
                         label = { Text(text = "Password") },
+                        isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp)
-                            .border(1.dp, if (state.emptyFields.contains("Password")) Color.Red else Color.Transparent, RoundedCornerShape(4.dp))
                     )
 
                     if (state.emptyFields.contains("Password")) {

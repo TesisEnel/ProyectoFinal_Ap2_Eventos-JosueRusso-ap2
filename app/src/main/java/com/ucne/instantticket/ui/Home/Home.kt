@@ -93,7 +93,7 @@ private fun ConsultaCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    
+
                     Text(
                         text = buildAnnotatedString {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {

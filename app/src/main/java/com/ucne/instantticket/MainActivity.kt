@@ -23,63 +23,81 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ucne.instantticket.data.entity.UsuarioEntity
+import com.ucne.instantticket.data.repository.UsuarioRepository
 import com.ucne.instantticket.ui.NavegacionInferior.Nav
+import com.ucne.instantticket.ui.RegistroUsuario.RegistroUsuarioViewModel
 import com.ucne.instantticket.ui.theme.InstantTicketTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             InstantTicketTheme {
-                val navController = rememberNavController()
+                /*val viewModel: RegistroUsuarioViewModel = hiltViewModel()
+                val usuario by viewModel.login.collectAsState(initial = UsuarioEntity())*/
+                
 
-                Scaffold(
-                    topBar = {
-
-                        TopAppBar(
-                            title = {
-                                Text(text = "EventoMaster")
-                            },
-                            actions = {
-                                IconButton(
-                                    onClick = {
-                                        navController.navigate("usuario")
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Person,
-                                        contentDescription = "usuario"
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        navController.navigate("login")
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.AddCircle,
-                                        contentDescription = "Login"
-                                    )
-                                }
-                            }
-                        )
-                    }
-
-                ){
-                    Nav(navController = navController)
-                }
+                menuPrincipal()
             }
         }
     }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun menuPrincipal(){
+
+    val navController = rememberNavController()
+
+    Scaffold(
+        topBar = {
+
+            TopAppBar(
+                title = {
+                    Text(text = "EventoMaster")
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            navController.navigate("usuario")
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "usuario"
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            navController.navigate("login")
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = "Login"
+                        )
+                    }
+                }
+            )
+        }
+
+    ){
+        Nav(navController = navController)
+    }
+
 }
 

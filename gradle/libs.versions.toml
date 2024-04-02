@@ -15,6 +15,7 @@ hiltAndroidPlugin = "2.48"
 hiltAndroid = "2.48"
 hiltNavigationCompose = "1.2.0"
 material3 = "<latest_version>"
+material3Version = "1.0.0-alpha01"
 retrofit = "2.9.0"
 moshiKotlin = "1.13.0"
 converterMoshi = "2.9.0"
@@ -26,6 +27,7 @@ appcompat = "1.6.1"
 [libraries]
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material3-v100alpha01 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

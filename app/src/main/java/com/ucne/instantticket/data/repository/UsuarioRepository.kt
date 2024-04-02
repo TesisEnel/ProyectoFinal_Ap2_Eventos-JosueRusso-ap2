@@ -18,7 +18,7 @@ class UsuarioRepository @Inject constructor(
         usuarioDao.delete(usuarioEntity)
     }
 
-    fun getUsuario(): Flow<List<UsuarioEntity>> {
-        return usuarioDao.getAll()
+    fun getUsuario(): Flow<UsuarioEntity> {
+        return usuarioDao.getUsuario()
     }
 }

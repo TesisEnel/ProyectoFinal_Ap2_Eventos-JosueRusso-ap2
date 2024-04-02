@@ -17,5 +17,7 @@ interface UsuarioDao {
     suspend fun delete(usuario: UsuarioEntity)
 
     @Query("Select * From usuario")
-    fun getAll(): Flow<List<UsuarioEntity>>
+    fun getUsuario(): Flow<UsuarioEntity>
+
+
 }

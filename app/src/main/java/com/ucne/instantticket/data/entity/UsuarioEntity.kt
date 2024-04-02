@@ -14,5 +14,8 @@ data class UsuarioEntity(
     val fechaNacimiento: String = "",
     val email: String = "",
     val password: String = "",
+    val islogin: Boolean = false,
+    val imagen: String = ""
+
 
 )

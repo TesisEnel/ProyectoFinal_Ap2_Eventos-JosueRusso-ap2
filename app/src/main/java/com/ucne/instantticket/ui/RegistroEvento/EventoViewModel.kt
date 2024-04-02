@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ucne.instantticket.data.entity.EventoEntity
 import com.ucne.instantticket.data.repository.EventoRepository
+import com.ucne.instantticket.ui.RegistroUsuario.UsuarioEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,6 +84,7 @@ class EventoViewModel @Inject constructor(
                 }
             }
 
+
             is EventoEvent.onDelete -> {
                 viewModelScope.launch {
                     eventoRepository.delete(event.evento)
@@ -100,7 +102,6 @@ class EventoViewModel @Inject constructor(
             }
         }
     }
-
     fun  Buscar(id: Int): Flow<EventoEntity>{
         return eventoRepository.getEventoId(id)
     }

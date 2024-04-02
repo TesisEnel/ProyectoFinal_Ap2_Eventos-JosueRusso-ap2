@@ -1,6 +1,6 @@
 package com.ucne.instantticket.ui.RegistroEvento
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,19 +11,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,17 +42,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ucne.instantticket.data.entity.EventoEntity
+import java.text.SimpleDateFormat
+import java.util.Locale
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import java.util.Calendar
+import java.util.Date
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int = 0 ) {
-if( id > 0)
-    remember {
-        viewModel.onEvent(EventoEvent.onSearch(id))
-        0
-    }
+fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int = 0) {
+    if (id > 0)
+        remember {
+            viewModel.onEvent(EventoEvent.onSearch(id))
+            0
+        }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val evento = state.evento
+    var datePickerState1 = rememberDatePickerState()
+    var datePickerState2 = rememberDatePickerState()
     val isError = state.error != null || state.emptyFields.isNotEmpty()
 
     Box(
@@ -77,26 +96,10 @@ if( id > 0)
                         isError = isError,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(5.dp))
+                            .padding(5.dp)
+                    )
                     if (state.emptyFields.contains("Nombre Evento")) {
                         Text(text = "Nombre Evento es requerido", color = Color.Red)
-                    }
-
-                    OutlinedTextField(
-                        value = evento.fecha,
-                        onValueChange = { viewModel.onEvent(EventoEvent.fecha(it)) },
-                        label = { Text(text = "Fecha") },
-                        isError = isError,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-                    if (state.emptyFields.contains("Fecha")) {
-                        Text(text = "Fecha es requerido", color = Color.Red)
                     }
 
                     OutlinedTextField(
@@ -108,24 +111,19 @@ if( id > 0)
                             .fillMaxWidth()
                             .padding(5.dp)
                     )
-                    if (state.emptyFields.contains("Descripcion")) {
-                        Text(text = "Descripcion es requerido", color = Color.Red)
+                    if (state.emptyFields.contains("des")) {
+                        Text(text = "La Descripcion es requerido", color = Color.Red)
                     }
 
+                    //Fecha
+                    DateInput(viewModel, datePickerState1)
+                    if (state.emptyFields.contains("Fecha")) {
+                        Text(text = "Fecha es requerido", color = Color.Red)
+                    }
 
-                    OutlinedTextField(
-                        value = evento.recordatorio,
-                        onValueChange = { viewModel.onEvent(EventoEvent.recordatorio(it)) },
-                        label = { Text(text = "Recordatorio") },
-                        isError = isError,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-                    if (state.emptyFields.contains("Recordatorio")) {
+                    //Recordatorio
+                    ReminderInput(viewModel, datePickerState2)
+                    if (state.emptyFields.contains("recordatorio")) {
                         Text(text = "Recordatorio es requerido", color = Color.Red)
                     }
 
@@ -156,6 +154,8 @@ if( id > 0)
                         Button(
                             onClick = {
                                 viewModel.onEvent(EventoEvent.onNew)
+                                datePickerState1.selectedDateMillis = null
+                                datePickerState2.selectedDateMillis = null
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -165,7 +165,10 @@ if( id > 0)
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(imageVector = Icons.Default.Refresh, contentDescription = "New")
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "New"
+                                )
                                 Spacer(modifier = Modifier.width(4.dp))
                             }
                         }
@@ -175,3 +178,143 @@ if( id > 0)
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateInput(viewModel: EventoViewModel, datePickerState : DatePickerState = rememberDatePickerState()) {
+    var showDialog by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val isError = state.error != null || state.emptyFields.isNotEmpty()
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = if (datePickerState.selectedDateMillis != null) SimpleDateFormat(
+                    "dd/MM/yyyy",
+                    Locale.getDefault()
+                ).format(datePickerState.selectedDateMillis!!) else "",
+                onValueChange = {},
+                isError = isError,
+                label = { Text(text = "Fecha") },
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Seleccionar fecha",
+                        modifier = Modifier.clickable { showDialog = true }
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    if (showDialog) {
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    }
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    datePickerState.selectedDateMillis?.let { selectedDate ->
+        val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
+        viewModel.onEvent(EventoEvent.fecha(formattedDate))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReminderInput(viewModel: EventoViewModel,  datePickerState : DatePickerState = rememberDatePickerState()) {
+    var showDialog by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val isError = state.error != null || state.emptyFields.isNotEmpty()
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = if (datePickerState.selectedDateMillis != null) SimpleDateFormat(
+                    "dd/MM/yyyy",
+                    Locale.getDefault()
+                ).format(datePickerState.selectedDateMillis!!) else "",
+                onValueChange = {},
+                label = { Text(text = "Fecha Recordatorio") },
+                isError = isError,
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Seleccionar fecha",
+                        modifier = Modifier.clickable { showDialog = true }
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    if (showDialog) {
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    }
+                ) {
+                    Text("Confirmar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    datePickerState.selectedDateMillis?.let { selectedDate ->
+        val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
+        viewModel.onEvent(EventoEvent.recordatorio(formattedDate))
+    }
+}
+
+
+
+

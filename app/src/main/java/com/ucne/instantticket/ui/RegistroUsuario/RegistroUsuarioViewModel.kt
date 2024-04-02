@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ucne.instantticket.data.entity.UsuarioEntity
 import com.ucne.instantticket.data.repository.UsuarioRepository
+import com.ucne.instantticket.ui.RegistroEvento.EventoState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,9 +19,9 @@ class RegistroUsuarioViewModel @Inject constructor(
     private val usuarioRepository : UsuarioRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(UsuarioState())
-    val state = _state.asStateFlow()
-
-    fun onEvent(event: UsuarioEvent) {
+    val state : StateFlow<UsuarioState> = _state.asStateFlow()
+    val login: Flow<UsuarioEntity> = usuarioRepository.getUsuario()
+    fun onEventUsario(event: UsuarioEvent) {
         when (event) {
             is UsuarioEvent.idUsuario -> {
                 _state.update {
@@ -78,6 +81,14 @@ class RegistroUsuarioViewModel @Inject constructor(
                 }
             }
 
+            is UsuarioEvent.Imagen -> {
+                _state.update {
+                    it.copy(
+                        usario = it.usario.copy(imagen = event.imagen)
+                    )
+                }
+            }
+
 
             UsuarioEvent.onSave -> {
                 guardar()
@@ -110,6 +121,7 @@ class RegistroUsuarioViewModel @Inject constructor(
         val fechaNacimiento = usuario.fechaNacimiento
         val email = usuario.email
         val password = usuario.password
+        val imagen = usuario.imagen
 
         val emptyFields = mutableListOf<String>()
         if (nombreCompleto.isBlank()) {
@@ -129,6 +141,10 @@ class RegistroUsuarioViewModel @Inject constructor(
         }
         if (password.isBlank()) {
             emptyFields.add("Password")
+        }
+
+        if (imagen.isBlank()) {
+            emptyFields.add("Imagen")
         }
 
         if (emptyFields.isNotEmpty()) {
@@ -206,6 +222,7 @@ sealed interface UsuarioEvent {
     data class fechaNacimiento(val fechaNacimiento: String) : UsuarioEvent
     data class email(val email: String) : UsuarioEvent
     data class password(val password:String) : UsuarioEvent
+    data class Imagen(val imagen: String) : UsuarioEvent
 
     data class onDelete(val usurio: UsuarioEntity ) : UsuarioEvent
 

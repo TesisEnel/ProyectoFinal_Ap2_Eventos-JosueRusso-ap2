@@ -5,5 +5,6 @@ enum class Screens {
     RegistroEventoScreen,
     LoginScreen,
     RegistroUsuarioScreen,
+    PerfilUsuario
 
 }

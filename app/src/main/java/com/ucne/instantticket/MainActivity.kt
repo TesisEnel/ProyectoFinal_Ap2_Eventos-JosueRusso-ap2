@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
@@ -33,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.ucne.instantticket.data.entity.UsuarioEntity
 import com.ucne.instantticket.data.repository.UsuarioRepository
 import com.ucne.instantticket.ui.Login.LoginScreen
@@ -49,7 +53,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             InstantTicketTheme {
 
-                menuPrincipal()
+                MenuPrincipal(viewModel = viewModel())
             }
         }
     }
@@ -58,19 +62,32 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun menuPrincipal(){
-
+fun MenuPrincipal(viewModel: RegistroUsuarioViewModel = viewModel()) {
     val navController = rememberNavController()
 
     Scaffold(
         topBar = {
-
             TopAppBar(
                 title = {
                     Text(text = "EventoMaster")
                 },
                 actions = {
 
+                    // Obtener imagen del usuario del ViewModel
+                   /* val imagenUsuario by viewModel.imagenUsuario.collectAsState()
+                    Image(
+                        painter = rememberImagePainter(data = imagenUsuario),
+                        contentDescription = "Imagen de perfil",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clickable {
+                                navController.navigate(Screens.PerfilUsuario.name) {
+                                    // Pasar datos del usuario a PerfilUsuario
+                                    launchSingleTop = true
+                                    popUpTo(Screens.Home.name) { inclusive = false }
+                                }
+                            }
+                    )*/
                     IconButton(
                         onClick = {
                             navController.navigate(Screens.LoginScreen.name)
@@ -78,16 +95,15 @@ fun menuPrincipal(){
                     ) {
                         Icon(
                             imageVector = Icons.Default.ExitToApp,
-                            contentDescription = "Login"
+                            contentDescription = "LoginOut"
                         )
                     }
                 }
             )
         }
-
     ){
         Nav(navController = navController)
     }
-
 }
+
 

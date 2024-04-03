@@ -84,6 +84,7 @@ fun RegistroEventoScreen(
         ) {
             LazyColumn(
                 modifier = Modifier.padding(16.dp)
+
             ) {
                 item {
                     Spacer(modifier = Modifier.height(40.dp))
@@ -121,11 +122,15 @@ fun RegistroEventoScreen(
                         Text(text = "La Descripcion es requerido", color = Color.Red)
                     }
 
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     //Fecha
                     DateInput(viewModel, datePickerState1)
                     if (state.emptyFields.contains("Fecha")) {
                         Text(text = "Fecha es requerido", color = Color.Red)
                     }
+
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     //Recordatorio
                     TimePickerInput(viewModel, timePickerState)
@@ -201,13 +206,10 @@ fun DateInput(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp)
-        ) {
+
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = if (datePickerState.selectedDateMillis != null) formatter.format(
@@ -228,7 +230,7 @@ fun DateInput(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-        }
+
     }
 
     if (showDialog) {
@@ -280,13 +282,11 @@ fun TimePickerInput(viewModel: EventoViewModel, timePickerState: TimePickerState
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier.padding(vertical = 16.dp)
-        ) {
+
+
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = timeFormatter.format(calendar.time),
@@ -303,7 +303,7 @@ fun TimePickerInput(viewModel: EventoViewModel, timePickerState: TimePickerState
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-        }
+
     }
 
     if (showDialog) {

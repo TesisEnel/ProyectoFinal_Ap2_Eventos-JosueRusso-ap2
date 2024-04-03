@@ -58,9 +58,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucne.instantticket.FileUtil
 import com.ucne.instantticket.R
+import com.ucne.instantticket.ui.RegistroEvento.EventoEvent
 import com.ucne.instantticket.ui.RegistroEvento.EventoViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -335,17 +338,25 @@ fun FechaNacimiento(viewModel: RegistroUsuarioViewModel, datePickerState : DateP
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isError = state.error != null || state.emptyFields.isNotEmpty()
 
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+
     Box(
+        modifier = Modifier
+               .fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = if (datePickerState.selectedDateMillis != null) SimpleDateFormat(
-                    "dd/MM/yyyy",
-                    Locale.getDefault()
-                ).format(datePickerState.selectedDateMillis!!) else "",
+                value = if (datePickerState.selectedDateMillis != null) formatter.format(
+                    Date(
+                        datePickerState.selectedDateMillis!!
+                    )
+                ) else "",
                 onValueChange = {},
                 isError = isError,
-                label = { Text(text = "Fecha") },
+                label = { Text(text = "Fecha de Nacimiento") },
                 readOnly = true,
                 trailingIcon = {
                     Icon(
@@ -356,6 +367,7 @@ fun FechaNacimiento(viewModel: RegistroUsuarioViewModel, datePickerState : DateP
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+
     }
 
     if (showDialog) {
@@ -385,7 +397,7 @@ fun FechaNacimiento(viewModel: RegistroUsuarioViewModel, datePickerState : DateP
     }
 
     datePickerState.selectedDateMillis?.let { selectedDate ->
-        val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
+        val formattedDate = formatter.format(Date(selectedDate))
         viewModel.onEventUsario(UsuarioEvent.fechaNacimiento(formattedDate))
     }
 }

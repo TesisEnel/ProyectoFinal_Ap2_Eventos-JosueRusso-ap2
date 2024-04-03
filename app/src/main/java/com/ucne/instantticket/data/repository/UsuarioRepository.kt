@@ -26,4 +26,8 @@ class UsuarioRepository @Inject constructor(
     suspend fun  update(usuarioEntity: UsuarioEntity){
         usuarioDao.update(usuarioEntity)
     }
+
+    fun getUsuarioId(id: Int): Flow<UsuarioEntity> {
+        return usuarioDao.getUsuarioId(id)
+    }
 }

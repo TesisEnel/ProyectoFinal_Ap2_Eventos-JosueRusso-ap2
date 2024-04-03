@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,6 +22,18 @@ class RegistroUsuarioViewModel @Inject constructor(
     private val _state = MutableStateFlow(UsuarioState())
     val state : StateFlow<UsuarioState> = _state.asStateFlow()
     val login: Flow<UsuarioEntity> = usuarioRepository.getUsuario()
+
+
+   /* private val _imagenUsuario = MutableStateFlow<String?>(null)
+    val imagenUsuario: StateFlow<String?> = _imagenUsuario
+
+    init {
+        viewModelScope.launch {
+            usuarioRepository.getUsuario().collect { usuario ->
+                _imagenUsuario.value = usuario.imagen
+            }
+        }
+    }*/
     fun onEventUsario(event: UsuarioEvent) {
         when (event) {
             is UsuarioEvent.idUsuario -> {
@@ -96,19 +109,13 @@ class RegistroUsuarioViewModel @Inject constructor(
                     )
                 }
             }
-
-
-            UsuarioEvent.onSave -> {
-                guardar()
-            }
-
-            UsuarioEvent.onNew -> {
-                _state.update {
-                    it.copy(
-                        successMessage = null,
-                        error = null,
-                        usario = UsuarioEntity()
-                    )
+            is UsuarioEvent.onSearch ->{
+                viewModelScope.launch{
+                    _state.update {
+                        it.copy(
+                            usario = Buscar(event.id).first()
+                        )
+                    }
                 }
             }
 
@@ -124,7 +131,25 @@ class RegistroUsuarioViewModel @Inject constructor(
                 }
             }
 
+            UsuarioEvent.onSave -> {
+                guardar()
+            }
+
+            UsuarioEvent.onNew -> {
+                _state.update {
+                    it.copy(
+                        successMessage = null,
+                        error = null,
+                        usario = UsuarioEntity()
+                    )
+                }
+            }
+
         }
+    }
+
+    fun  Buscar(id: Int): Flow<UsuarioEntity>{
+        return usuarioRepository.getUsuarioId(id)
     }
 
 
@@ -242,6 +267,8 @@ sealed interface UsuarioEvent {
 
     data class onUpdate(val usurio: UsuarioEntity ) : UsuarioEvent
     data class onDelete(val usurio: UsuarioEntity ) : UsuarioEvent
+
+    data class onSearch(val id: Int ) : UsuarioEvent
 
     object onSave : UsuarioEvent
     object onNew : UsuarioEvent

@@ -24,5 +24,7 @@ interface UsuarioDao {
     @Query("Select * From usuario")
     fun getUsuario(): Flow<UsuarioEntity>
 
+    @Query("Select * From usuario Where idUsuario = :id")
+    fun getUsuarioId(id: Int): Flow<UsuarioEntity>
 
 }

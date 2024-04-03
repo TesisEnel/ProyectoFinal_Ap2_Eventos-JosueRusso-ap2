@@ -100,6 +100,7 @@ dependencies {
     //biometric
     implementation(libs.androidx.biometric)
 
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
 
 

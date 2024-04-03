@@ -15,10 +15,19 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import com.ucne.instantticket.NotificationReceiver
+import dagger.hilt.android.qualifiers.ApplicationContext
+
 
 @HiltViewModel
 class EventoViewModel @Inject constructor(
-    private val eventoRepository : EventoRepository
+    private val eventoRepository : EventoRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _state = MutableStateFlow(EventoState())
     val state : StateFlow<EventoState> = _state.asStateFlow()
@@ -112,6 +121,20 @@ class EventoViewModel @Inject constructor(
         val fecha = evento.fecha
         val descripcion = evento.descripcion
         val recordatorio = evento.recordatorio
+
+        val TIME_INTERVAL = 60000 // 60 segundos en milisegundos
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, NotificationReceiver::class.java)
+        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        } else {
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        // Ajusta el tiempo de la notificación según tu lógica
+        val timeInMillis = System.currentTimeMillis() + TIME_INTERVAL // Asegúrate de que TIME_INTERVAL esté definido
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
 
 
         val emptyFields = mutableListOf<String>()

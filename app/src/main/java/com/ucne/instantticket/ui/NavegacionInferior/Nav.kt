@@ -57,7 +57,7 @@ fun Nav(navController: NavHostController){
     ){paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = Screens.Home.name,
+            startDestination = Screens.LoginScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
         ) {
@@ -71,15 +71,22 @@ fun Nav(navController: NavHostController){
             ){
                 val id = it.arguments?.getInt("id") ?: 0
                 RegistroEventoScreen(
-                    id = id
+                    id = id,
+                    onclickHome = {navController.navigate(Screens.Home.name)}
                 )
             }
 
-            composable("login") {
-                LoginScreen()
+            composable(route = Screens.LoginScreen.name) {
+                LoginScreen(
+                    onclickHome = { navController.navigate(Screens.Home.name) },
+                    onclickRegistro =  { navController.navigate(Screens.RegistroUsuarioScreen.name) }
+                )
+
             }
-            composable("usuario") {
-                RegistroUsuarioScreen()
+            composable(route = Screens.RegistroUsuarioScreen.name) {
+
+                RegistroUsuarioScreen(onclickBack = {navController.navigateUp()})
+
             }
         }
     }

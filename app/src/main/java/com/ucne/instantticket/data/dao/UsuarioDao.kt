@@ -3,7 +3,9 @@ package com.ucne.instantticket.data.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
+import com.ucne.instantticket.data.entity.EventoEntity
 import com.ucne.instantticket.data.entity.UsuarioEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +17,9 @@ interface UsuarioDao {
 
     @Delete
     suspend fun delete(usuario: UsuarioEntity)
+
+    @Update
+    suspend fun update(usuario: UsuarioEntity)
 
     @Query("Select * From usuario")
     fun getUsuario(): Flow<UsuarioEntity>

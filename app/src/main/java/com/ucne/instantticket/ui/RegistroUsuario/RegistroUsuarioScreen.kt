@@ -65,7 +65,10 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel()) {
+fun RegistroUsuarioScreen(
+    viewModel: RegistroUsuarioViewModel = hiltViewModel(),
+    onclickBack: () -> Unit
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val usuario = state.usario
     val context = LocalContext.current
@@ -224,14 +227,14 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                     val errorMessages = state.error
                     val dialogVisible = remember { mutableStateOf(false) }
 
-// Cuando hay mensajes de error, establece dialogVisible a true para mostrar el diálogo.
+
                     LaunchedEffect(errorMessages) {
                         if (!errorMessages.isNullOrEmpty()) {
                             dialogVisible.value = true
                         }
                     }
 
-// Muestra el AlertDialog solo si dialogVisible es true.
+
                     if (dialogVisible.value) {
                         AlertDialog(
                             onDismissRequest = {
@@ -274,6 +277,16 @@ fun RegistroUsuarioScreen(viewModel: RegistroUsuarioViewModel = hiltViewModel())
                         Button(
                             onClick = {
                                 viewModel.onEventUsario(UsuarioEvent.onSave)
+                                if (state.emptyFields.contains("Nombre Completo") &&
+                                    state.emptyFields.contains("Nombre de Usuario") &&
+                                    state.emptyFields.contains("Edad") &&
+                                    state.emptyFields.contains("Email")&&
+                                    state.emptyFields.contains("Password") &&
+                                    isError && usuario.imagen.isEmpty()
+                                )
+                                    onclickBack.invoke()
+
+
                             },
                             modifier = Modifier
                                 .weight(1f)

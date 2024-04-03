@@ -35,7 +35,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ucne.instantticket.data.entity.UsuarioEntity
 import com.ucne.instantticket.data.repository.UsuarioRepository
+import com.ucne.instantticket.ui.Login.LoginScreen
 import com.ucne.instantticket.ui.NavegacionInferior.Nav
+import com.ucne.instantticket.ui.NavegacionInferior.Screens
 import com.ucne.instantticket.ui.RegistroUsuario.RegistroUsuarioViewModel
 import com.ucne.instantticket.ui.theme.InstantTicketTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,9 +48,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             InstantTicketTheme {
-                /*val viewModel: RegistroUsuarioViewModel = hiltViewModel()
-                val usuario by viewModel.login.collectAsState(initial = UsuarioEntity())*/
-                
 
                 menuPrincipal()
             }
@@ -71,23 +70,14 @@ fun menuPrincipal(){
                     Text(text = "EventoMaster")
                 },
                 actions = {
+
                     IconButton(
                         onClick = {
-                            navController.navigate("usuario")
+                            navController.navigate(Screens.LoginScreen.name)
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "usuario"
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                            navController.navigate("login")
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
+                            imageVector = Icons.Default.ExitToApp,
                             contentDescription = "Login"
                         )
                     }

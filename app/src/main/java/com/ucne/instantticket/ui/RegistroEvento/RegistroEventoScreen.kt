@@ -3,6 +3,7 @@ package com.ucne.instantticket.ui.RegistroEvento
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -20,12 +20,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,27 +41,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.text.SimpleDateFormat
-import java.util.Locale
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int = 0) {
+fun RegistroEventoScreen(
+    viewModel: EventoViewModel = hiltViewModel(),
+    id: Int = 0,
+    onclickHome: () -> Unit
+) {
     if (id > 0)
         remember {
             viewModel.onEvent(EventoEvent.onSearch(id))
@@ -64,7 +69,8 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
     val state by viewModel.state.collectAsStateWithLifecycle()
     val evento = state.evento
     var datePickerState1 = rememberDatePickerState()
-    var datePickerState2 = rememberDatePickerState()
+    val timePickerState = rememberTimePickerState()
+
     val isError = state.error != null || state.emptyFields.isNotEmpty()
 
     Box(
@@ -122,7 +128,7 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                     }
 
                     //Recordatorio
-                    ReminderInput(viewModel, datePickerState2)
+                    TimePickerInput(viewModel, timePickerState)
                     if (state.emptyFields.contains("recordatorio")) {
                         Text(text = "Recordatorio es requerido", color = Color.Red)
                     }
@@ -137,6 +143,7 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                         Button(
                             onClick = {
                                 viewModel.onEvent(EventoEvent.onSave)
+                                onclickHome.invoke()
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -155,7 +162,7 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
                             onClick = {
                                 viewModel.onEvent(EventoEvent.onNew)
                                 datePickerState1.selectedDateMillis = null
-                                datePickerState2.selectedDateMillis = null
+
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -181,24 +188,33 @@ fun RegistroEventoScreen(viewModel: EventoViewModel = hiltViewModel(), id: Int =
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateInput(viewModel: EventoViewModel, datePickerState : DatePickerState = rememberDatePickerState()) {
+fun DateInput(
+    viewModel: EventoViewModel,
+    datePickerState: DatePickerState = rememberDatePickerState()
+) {
     var showDialog by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isError = state.error != null || state.emptyFields.isNotEmpty()
 
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp)
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = if (datePickerState.selectedDateMillis != null) SimpleDateFormat(
-                    "dd/MM/yyyy",
-                    Locale.getDefault()
-                ).format(datePickerState.selectedDateMillis!!) else "",
+                value = if (datePickerState.selectedDateMillis != null) formatter.format(
+                    Date(
+                        datePickerState.selectedDateMillis!!
+                    )
+                ) else "",
                 onValueChange = {},
                 isError = isError,
                 label = { Text(text = "Fecha") },
@@ -242,39 +258,46 @@ fun DateInput(viewModel: EventoViewModel, datePickerState : DatePickerState = re
     }
 
     datePickerState.selectedDateMillis?.let { selectedDate ->
-        val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
+        val formattedDate = formatter.format(Date(selectedDate))
         viewModel.onEvent(EventoEvent.fecha(formattedDate))
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReminderInput(viewModel: EventoViewModel,  datePickerState : DatePickerState = rememberDatePickerState()) {
+fun TimePickerInput(viewModel: EventoViewModel, timePickerState: TimePickerState) {
     var showDialog by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isError = state.error != null || state.emptyFields.isNotEmpty()
 
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp)
+    val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+        set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+        set(Calendar.MINUTE, timePickerState.minute)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = if (datePickerState.selectedDateMillis != null) SimpleDateFormat(
-                    "dd/MM/yyyy",
-                    Locale.getDefault()
-                ).format(datePickerState.selectedDateMillis!!) else "",
+                value = timeFormatter.format(calendar.time),
                 onValueChange = {},
-                label = { Text(text = "Fecha Recordatorio") },
+                label = { Text(text = "Hora Recordatorio") },
                 isError = isError,
                 readOnly = true,
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Seleccionar fecha",
+                        contentDescription = "Seleccionar hora",
                         modifier = Modifier.clickable { showDialog = true }
                     )
                 },
@@ -284,36 +307,46 @@ fun ReminderInput(viewModel: EventoViewModel,  datePickerState : DatePickerState
     }
 
     if (showDialog) {
-        DatePickerDialog(
-            onDismissRequest = { showDialog = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDialog = false
-                    }
+        Dialog(onDismissRequest = { showDialog = false }) {
+            Surface {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDialog = false
+                    Text(text = "Seleccionar Hora", style = MaterialTheme.typography.headlineSmall)
+                    TimePicker(state = timePickerState)
+                    Row {
+                        TextButton(
+                            onClick = {
+                                calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                calendar.set(Calendar.MINUTE, timePickerState.minute)
+                                viewModel.onEvent(
+                                    EventoEvent.recordatorio(
+                                        timeFormatter.format(
+                                            calendar.time
+                                        )
+                                    )
+                                )
+                                showDialog = false
+                            }
+                        ) {
+                            Text("Confirmar")
+                        }
+                        TextButton(
+                            onClick = { showDialog = false }
+                        ) {
+                            Text("Cancelar")
+                        }
                     }
-                ) {
-                    Text("Cancelar")
                 }
             }
-        ) {
-            DatePicker(state = datePickerState)
         }
     }
-
-    datePickerState.selectedDateMillis?.let { selectedDate ->
-        val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(selectedDate)
-        viewModel.onEvent(EventoEvent.recordatorio(formattedDate))
-    }
 }
+
+
+
+
 
 
 

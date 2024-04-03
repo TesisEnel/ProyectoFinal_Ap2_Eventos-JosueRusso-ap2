@@ -89,6 +89,14 @@ class RegistroUsuarioViewModel @Inject constructor(
                 }
             }
 
+            is UsuarioEvent.isLogin -> {
+                _state.update {
+                    it.copy(
+                        usario = it.usario.copy(islogin = event.isLogin.toBoolean())
+                    )
+                }
+            }
+
 
             UsuarioEvent.onSave -> {
                 guardar()
@@ -110,8 +118,15 @@ class RegistroUsuarioViewModel @Inject constructor(
                 }
             }
 
+            is UsuarioEvent.onUpdate -> {
+                viewModelScope.launch {
+                    usuarioRepository.update(event.usurio)
+                }
+            }
+
         }
     }
+
 
     private fun guardar() {
         val usuario = state.value.usario
@@ -223,7 +238,9 @@ sealed interface UsuarioEvent {
     data class email(val email: String) : UsuarioEvent
     data class password(val password:String) : UsuarioEvent
     data class Imagen(val imagen: String) : UsuarioEvent
+    data class isLogin(val isLogin: String) : UsuarioEvent
 
+    data class onUpdate(val usurio: UsuarioEntity ) : UsuarioEvent
     data class onDelete(val usurio: UsuarioEntity ) : UsuarioEvent
 
     object onSave : UsuarioEvent

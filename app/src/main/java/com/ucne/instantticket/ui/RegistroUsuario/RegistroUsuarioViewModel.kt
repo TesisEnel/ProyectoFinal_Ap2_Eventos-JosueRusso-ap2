@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ucne.instantticket.data.entity.UsuarioEntity
 import com.ucne.instantticket.data.repository.UsuarioRepository
-import com.ucne.instantticket.ui.RegistroEvento.EventoState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,23 +16,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegistroUsuarioViewModel @Inject constructor(
-    private val usuarioRepository : UsuarioRepository
+    private val usuarioRepository: UsuarioRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(UsuarioState())
-    val state : StateFlow<UsuarioState> = _state.asStateFlow()
+    val state: StateFlow<UsuarioState> = _state.asStateFlow()
     val login: Flow<UsuarioEntity> = usuarioRepository.getUsuario()
 
-
-   /* private val _imagenUsuario = MutableStateFlow<String?>(null)
-    val imagenUsuario: StateFlow<String?> = _imagenUsuario
-
-    init {
-        viewModelScope.launch {
-            usuarioRepository.getUsuario().collect { usuario ->
-                _imagenUsuario.value = usuario.imagen
-            }
-        }
-    }*/
     fun onEventUsario(event: UsuarioEvent) {
         when (event) {
             is UsuarioEvent.idUsuario -> {
@@ -109,8 +97,9 @@ class RegistroUsuarioViewModel @Inject constructor(
                     )
                 }
             }
-            is UsuarioEvent.onSearch ->{
-                viewModelScope.launch{
+
+            is UsuarioEvent.onSearch -> {
+                viewModelScope.launch {
                     _state.update {
                         it.copy(
                             usario = Buscar(event.id).first()
@@ -148,7 +137,7 @@ class RegistroUsuarioViewModel @Inject constructor(
         }
     }
 
-    fun  Buscar(id: Int): Flow<UsuarioEntity>{
+    fun Buscar(id: Int): Flow<UsuarioEntity> {
         return usuarioRepository.getUsuarioId(id)
     }
 
@@ -246,6 +235,7 @@ class RegistroUsuarioViewModel @Inject constructor(
         return errores
     }
 }
+
 data class UsuarioState(
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -261,14 +251,14 @@ sealed interface UsuarioEvent {
     data class edad(val edad: String) : UsuarioEvent
     data class fechaNacimiento(val fechaNacimiento: String) : UsuarioEvent
     data class email(val email: String) : UsuarioEvent
-    data class password(val password:String) : UsuarioEvent
+    data class password(val password: String) : UsuarioEvent
     data class Imagen(val imagen: String) : UsuarioEvent
     data class isLogin(val isLogin: String) : UsuarioEvent
 
-    data class onUpdate(val usurio: UsuarioEntity ) : UsuarioEvent
-    data class onDelete(val usurio: UsuarioEntity ) : UsuarioEvent
+    data class onUpdate(val usurio: UsuarioEntity) : UsuarioEvent
+    data class onDelete(val usurio: UsuarioEntity) : UsuarioEvent
 
-    data class onSearch(val id: Int ) : UsuarioEvent
+    data class onSearch(val id: Int) : UsuarioEvent
 
     object onSave : UsuarioEvent
     object onNew : UsuarioEvent

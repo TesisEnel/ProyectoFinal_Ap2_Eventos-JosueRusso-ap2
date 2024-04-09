@@ -25,6 +25,7 @@ room = "2.6.1"
 navigationCompose = "2.7.7"
 appcompat = "1.6.1"
 workRuntimeKtx = "2.9.0"
+hiltCommon = "1.2.0"
 
 [libraries]
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
@@ -66,6 +67,7 @@ lifecycleRuntimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runt
 lifecycleViewmodelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifeCycleVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

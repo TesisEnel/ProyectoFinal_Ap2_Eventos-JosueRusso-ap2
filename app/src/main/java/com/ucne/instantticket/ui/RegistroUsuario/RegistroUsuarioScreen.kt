@@ -58,8 +58,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucne.instantticket.FileUtil
 import com.ucne.instantticket.R
-import com.ucne.instantticket.ui.RegistroEvento.EventoEvent
-import com.ucne.instantticket.ui.RegistroEvento.EventoViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -175,8 +173,12 @@ fun RegistroUsuarioScreen(
                         isError = isError,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
-                            val image = if (passwordVisible) painterResource(id = R.drawable.ic_visibility) else painterResource(id = R.drawable.ic_visibility_off)
-                            val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            val image =
+                                if (passwordVisible) painterResource(id = R.drawable.ic_visibility) else painterResource(
+                                    id = R.drawable.ic_visibility_off
+                                )
+                            val description =
+                                if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(painter = image, contentDescription = description)
                             }
@@ -283,7 +285,7 @@ fun RegistroUsuarioScreen(
                                 if (state.emptyFields.contains("Nombre Completo") &&
                                     state.emptyFields.contains("Nombre de Usuario") &&
                                     state.emptyFields.contains("Edad") &&
-                                    state.emptyFields.contains("Email")&&
+                                    state.emptyFields.contains("Email") &&
                                     state.emptyFields.contains("Password") &&
                                     isError && usuario.imagen.isEmpty()
                                 )
@@ -333,7 +335,10 @@ fun RegistroUsuarioScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FechaNacimiento(viewModel: RegistroUsuarioViewModel, datePickerState : DatePickerState = rememberDatePickerState()) {
+fun FechaNacimiento(
+    viewModel: RegistroUsuarioViewModel,
+    datePickerState: DatePickerState = rememberDatePickerState()
+) {
     var showDialog by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isError = state.error != null || state.emptyFields.isNotEmpty()
@@ -344,29 +349,29 @@ fun FechaNacimiento(viewModel: RegistroUsuarioViewModel, datePickerState : DateP
 
     Box(
         modifier = Modifier
-               .fillMaxSize(),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = if (datePickerState.selectedDateMillis != null) formatter.format(
-                    Date(
-                        datePickerState.selectedDateMillis!!
-                    )
-                ) else "",
-                onValueChange = {},
-                isError = isError,
-                label = { Text(text = "Fecha de Nacimiento") },
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Seleccionar fecha",
-                        modifier = Modifier.clickable { showDialog = true }
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = if (datePickerState.selectedDateMillis != null) formatter.format(
+                Date(
+                    datePickerState.selectedDateMillis!!
+                )
+            ) else "",
+            onValueChange = {},
+            isError = isError,
+            label = { Text(text = "Fecha de Nacimiento") },
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = "Seleccionar fecha",
+                    modifier = Modifier.clickable { showDialog = true }
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
     }
 

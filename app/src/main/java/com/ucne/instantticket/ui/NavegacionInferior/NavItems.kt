@@ -23,4 +23,4 @@ val listOfNavItems = listOf(
         route = Screens.RegistroEventoScreen.name + "/0"
     ),
 
-)
+    )

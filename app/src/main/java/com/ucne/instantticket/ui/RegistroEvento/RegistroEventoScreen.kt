@@ -1,5 +1,6 @@
 package com.ucne.instantticket.ui.RegistroEvento
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ucne.instantticket.NotificationService
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -210,26 +212,26 @@ fun DateInput(
         contentAlignment = Alignment.Center
     ) {
 
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = if (datePickerState.selectedDateMillis != null) formatter.format(
-                    Date(
-                        datePickerState.selectedDateMillis!!
-                    )
-                ) else "",
-                onValueChange = {},
-                isError = isError,
-                label = { Text(text = "Fecha") },
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Seleccionar fecha",
-                        modifier = Modifier.clickable { showDialog = true }
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = if (datePickerState.selectedDateMillis != null) formatter.format(
+                Date(
+                    datePickerState.selectedDateMillis!!
+                )
+            ) else "",
+            onValueChange = {},
+            isError = isError,
+            label = { Text(text = "Fecha") },
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = "Seleccionar fecha",
+                    modifier = Modifier.clickable { showDialog = true }
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
     }
 
@@ -287,22 +289,22 @@ fun TimePickerInput(viewModel: EventoViewModel, timePickerState: TimePickerState
     ) {
 
 
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = timeFormatter.format(calendar.time),
-                onValueChange = {},
-                label = { Text(text = "Hora Recordatorio") },
-                isError = isError,
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Seleccionar hora",
-                        modifier = Modifier.clickable { showDialog = true }
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = timeFormatter.format(calendar.time),
+            onValueChange = {},
+            label = { Text(text = "Hora Recordatorio") },
+            isError = isError,
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = "Seleccionar hora",
+                    modifier = Modifier.clickable { showDialog = true }
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
     }
 

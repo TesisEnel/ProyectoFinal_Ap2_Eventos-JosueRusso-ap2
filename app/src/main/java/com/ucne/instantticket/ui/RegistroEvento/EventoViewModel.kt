@@ -1,36 +1,34 @@
 package com.ucne.instantticket.ui.RegistroEvento
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ucne.instantticket.data.entity.EventoEntity
-import com.ucne.instantticket.data.repository.EventoRepository
-import com.ucne.instantticket.ui.RegistroUsuario.UsuarioEvent
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ucne.instantticket.NotificationReceiver
+import com.ucne.instantticket.data.entity.EventoEntity
+import com.ucne.instantticket.data.repository.EventoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @HiltViewModel
 class EventoViewModel @Inject constructor(
-    private val eventoRepository : EventoRepository,
+    private val eventoRepository: EventoRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _state = MutableStateFlow(EventoState())
-    val state : StateFlow<EventoState> = _state.asStateFlow()
+    val state: StateFlow<EventoState> = _state.asStateFlow()
     val evento: Flow<List<EventoEntity>> = eventoRepository.getEvento()
 
     fun onEvent(event: EventoEvent) {
@@ -78,7 +76,6 @@ class EventoViewModel @Inject constructor(
             }
 
 
-
             EventoEvent.onSave -> {
                 guardarEvento()
             }
@@ -100,8 +97,8 @@ class EventoViewModel @Inject constructor(
                 }
             }
 
-            is EventoEvent.onSearch ->{
-                viewModelScope.launch{
+            is EventoEvent.onSearch -> {
+                viewModelScope.launch {
                     _state.update {
                         it.copy(
                             evento = Buscar(event.id).first()
@@ -111,7 +108,8 @@ class EventoViewModel @Inject constructor(
             }
         }
     }
-    fun  Buscar(id: Int): Flow<EventoEntity>{
+//no tomar el flow directamente si no el lofecicle
+    fun Buscar(id: Int): Flow<EventoEntity> {
         return eventoRepository.getEventoId(id)
     }
 
@@ -127,13 +125,19 @@ class EventoViewModel @Inject constructor(
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, NotificationReceiver::class.java)
         val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
         } else {
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
         // Ajusta el tiempo de la notificación según tu lógica
-        val timeInMillis = System.currentTimeMillis() + TIME_INTERVAL // Asegúrate de que TIME_INTERVAL esté definido
+        val timeInMillis =
+            System.currentTimeMillis() + TIME_INTERVAL // Asegúrate de que TIME_INTERVAL esté definido
         alarmManager.set(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
 
 
@@ -164,10 +168,9 @@ class EventoViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                if (evento.idevento > 0 ){
+                if (evento.idevento > 0) {
                     eventoRepository.update(evento)
-                }
-                else{
+                } else {
                     eventoRepository.upsert(evento)
                 }
                 _state.update {
@@ -192,6 +195,7 @@ class EventoViewModel @Inject constructor(
     }
 
 }
+
 data class EventoState(
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -199,7 +203,7 @@ data class EventoState(
     val successMessage: String? = null,
     val emptyFields: List<String> = listOf(),
 
-)
+    )
 
 sealed interface EventoEvent {
     data class idevento(val idevento: String) : EventoEvent
@@ -208,8 +212,8 @@ sealed interface EventoEvent {
     data class descripcion(val descripcion: String) : EventoEvent
     data class recordatorio(val recordatorio: String) : EventoEvent
 
-    data class onDelete(val evento: EventoEntity ) : EventoEvent
-    data class onSearch(val id: Int ) : EventoEvent
+    data class onDelete(val evento: EventoEntity) : EventoEvent
+    data class onSearch(val id: Int) : EventoEvent
 
     object onSave : EventoEvent
     object onNew : EventoEvent

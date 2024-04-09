@@ -25,4 +25,7 @@ interface EventoDao {
 
     @Query("Select * From evento Where idevento = :id")
     fun getEventoId(id: Int): Flow<EventoEntity>
+
+    @Query("SELECT * FROM evento WHERE fecha > :currentTimeMillis ORDER BY fecha ASC")
+    fun getEventosProximos(currentTimeMillis: Long): Flow<List<EventoEntity>>
 }

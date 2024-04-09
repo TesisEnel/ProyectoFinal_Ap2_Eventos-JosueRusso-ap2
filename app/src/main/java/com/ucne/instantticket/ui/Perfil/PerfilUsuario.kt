@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.ucne.instantticket.data.entity.UsuarioEntity
-import coil.compose.rememberImagePainter
 
 
 @Composable
@@ -30,7 +30,7 @@ fun PerfilUsuario(usuario: UsuarioEntity, navController: NavController) {
     ) {
 
         Image(
-            painter = rememberImagePainter(data = usuario.imagen),
+            painter = rememberAsyncImagePainter(model = usuario.imagen),
             contentDescription = "Imagen de perfil",
             modifier = Modifier
                 .size(120.dp)
@@ -41,7 +41,6 @@ fun PerfilUsuario(usuario: UsuarioEntity, navController: NavController) {
         Text(text = "Nombre: ${usuario.nombreCompleto}")
         Text(text = "Edad: ${usuario.edad}")
 
-        // Botón para navegar hacia atrás
         Button(
             onClick = { navController.popBackStack() },
             modifier = Modifier.padding(top = 16.dp)

@@ -29,4 +29,9 @@ class EventoRepository@Inject constructor(
     fun getEvento(): Flow<List<EventoEntity>> {
         return eventoDao.getAllEvent()
     }
+
+    fun getEventosProximos(): Flow<List<EventoEntity>> {
+        val limiteTiempo = System.currentTimeMillis() + 24 * 60 * 60 * 1000
+        return eventoDao.getEventosProximos(limiteTiempo)
+    }
 }

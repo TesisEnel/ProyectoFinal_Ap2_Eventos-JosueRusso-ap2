@@ -1,54 +1,78 @@
 package com.ucne.instantticket
 
-import android.app.IntentService
-import android.content.Intent
+import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.ucne.instantticket.data.entity.EventoEntity
+import com.ucne.instantticket.data.repository.EventoRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class NotificationService(appContext: Context, workerParams: WorkerParameters) :
-    Worker(appContext, workerParams) {
+@HiltWorker
+class NotificationService @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val eventoRepository: EventoRepository
+) : Worker(appContext, workerParams) {
+        override fun doWork(): Result {
 
-    override fun doWork(): Result {
-        // Aquí deberías recuperar la información del evento para determinar la fecha del evento y el recordatorio
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val eventos = obtenerEventosParaNotificar(eventoRepository).first()
+                    eventos.forEach { evento ->
+                        programarNotificacion(evento)
+                    }
+                } catch (e: Exception) {
+                }
+            }
+            return Result.success()
+        }
 
-        // Supongamos que tienes una función para obtener la fecha del evento
-        val fechaEvento = obtenerFechaEvento()
+    @SuppressLint("MissingPermission")
+    private fun programarNotificacion(evento: EventoEntity) {
+        val alarmManager =
+            applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(applicationContext, NotificationReceiver::class.java).apply {
+            putExtra("evento_id", evento.idevento)
+            putExtra("nombre_evento", evento.nombreEvento)
+            putExtra("descripcion_evento", evento.descripcion)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            evento.idevento,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
-        // Supongamos que también tienes una función para obtener el tiempo de recordatorio
-        val tiempoRecordatorio = obtenerTiempoRecordatorio()
-
-        // Calcula el tiempo para mostrar la notificación
-        val tiempoNotificacion = fechaEvento - tiempoRecordatorio
-
-        // Programa la notificación
-        programarNotificacion(tiempoNotificacion)
-
-        return Result.success()
+        val tiempoNotificacion =
+            calcularTiempoNotificacion(evento.fecha.toLong(), evento.recordatorio.toLong())
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            tiempoNotificacion,
+            pendingIntent
+        )
     }
 
-    private fun programarNotificacion(tiempoNotificacion: Long) {
-        val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(applicationContext, NotificationReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-        // Aquí debes configurar adecuadamente el tiempo de la notificación según tu lógica
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, tiempoNotificacion, pendingIntent)
+    private fun calcularTiempoNotificacion(fechaEvento: Long, tiempoRecordatorio: Long): Long {
+        return fechaEvento - tiempoRecordatorio
     }
 
-    private fun obtenerFechaEvento(): Long {
-        // Aquí debes implementar la lógica para obtener la fecha del evento en milisegundos
-        // Por ejemplo, puedes obtener la fecha de la entidad EventoEntity
-        return System.currentTimeMillis() + 86400000 // Supongamos que la fecha es dentro de 24 horas
-    }
+    private fun obtenerEventosParaNotificar(eventoRepository: EventoRepository): Flow<List<EventoEntity>> {
 
-    private fun obtenerTiempoRecordatorio(): Long {
-        // Aquí debes implementar la lógica para obtener el tiempo de recordatorio en milisegundos
-        // Por ejemplo, puedes obtener el tiempo de recordatorio de la entidad EventoEntity
-        return 3600000 // Supongamos que el recordatorio es una hora antes del evento
+        return eventoRepository.getEventosProximos()
     }
 }

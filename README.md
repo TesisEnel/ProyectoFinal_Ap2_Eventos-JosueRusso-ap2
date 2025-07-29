@@ -1,4 +1,3 @@
-
 # Evento Master
 
 ### Esta app esta enfocada a la agenda de eventos de una personas esta app cuenta de un login con un registro de usuario y el registro de evento con su consuta de evento 
